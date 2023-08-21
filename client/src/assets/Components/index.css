@@ -1,0 +1,8 @@
+.fade-in {
+    opacity: 0; /* Comenzar con opacidad 0 */
+    transition: opacity 0.3s ease-in-out; /* Definir la transición */
+}
+
+.fade-in.active {
+opacity: 1; /* Cambiar a opacidad 1 para mostrar el componente */
+}
