@@ -6,15 +6,26 @@ import TaskCard from '../../Components/TaskCard.jsx';
 import Button from '../../Components/Button.jsx';
 import Modal from '../../Components/Modal.jsx';
 
+// Forms
+import FormCreate from './FormCreate'
 const Index = () => {
     const [tasks, setTasks] = useState();
     const [showModalNew, setShowModalNew] = useState(false);
     
     const fetchData = async () => {
         const { data } = await axios.get('http://localhost:8000/tasks/api/v1/tasks');
-        console.log(data)
         setTasks(data)
     }
+
+    const deleteTask = async (task) => {
+        try {
+            await axios.delete(`http://localhost:8000/tasks/api/v1/tasks/${task.id}`);
+            setTasks(prevTasks => prevTasks.filter(t => t.id !== task.id)); // Remove the deleted task from state
+        } catch (error) {
+            // Handle error if needed
+        }
+    }
+    
 
     useEffect(() => {
         fetchData()
@@ -32,9 +43,17 @@ const Index = () => {
                                 label='New'
                                 icon='pi pi-plus'
                             />
-                            <Modal visible={showModalNew}>
-
-                            </Modal>
+                            <Modal 
+                                icon='pi pi-plus' 
+                                header='Create Task' 
+                                visible={showModalNew} 
+                                children={
+                                    <FormCreate 
+                                        onClickCancel={() => {setShowModalNew(false)}}
+                                        fetchData={fetchData}                         
+                                    />
+                                }
+                            />
                         </h2>
                         <p className="mt-2 text-lg leading-8 text-gray-600">
                             Learn how to grow your business with our expert advice.
@@ -48,6 +67,7 @@ const Index = () => {
                                     title={task.title}
                                     description={task.description}
                                     completed={task.done}
+                                    onClickTrash={() => {deleteTask(task)}}
                                 />
                             )
                         })}
