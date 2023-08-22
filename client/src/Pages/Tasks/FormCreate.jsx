@@ -1,15 +1,27 @@
 import React from 'react'
 import { useForm } from "react-hook-form"; 
 import axios from 'axios';
+import toast, { Toaster } from 'react-hot-toast';
 
 const FormCreate = (props) => {
     const { reset, register, handleSubmit, formState: { errors } } = useForm();
     
-    const onSubmit = (data) => {
-        axios.post('http://127.0.0.1:8000/tasks/api/v1/tasks/' , data);
-        props.onClickCancel();
-        props.fetchData();
-        reset();
+    const onSubmit = async (data) => {
+        try {
+            let response = await axios.post('http://127.0.0.1:8000/tasks/api/v1/tasks/', data);
+            props.onClickCancel(); // Delayed execution
+            props.fetchData(); // Delayed execution
+            toast.success('Task created!', {
+                style: {
+                    background: 'green',
+                    color: 'white'
+                },
+                duration: 2000, // Set the desired duration in milliseconds (3 seconds in this case)
+            });
+            reset(); // Reset the form immediately
+        } catch (e) {
+            toast.error('Error!');
+        }
     };
 
     const selectItems = [
@@ -43,14 +55,10 @@ const FormCreate = (props) => {
 
                 <div className='mb-5'>
                     <label htmlFor="done" className="font-normal text-gray-700 w-full text-sm mb-2">Select an option</label>
-                    <select 
-                        className='text-sm shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
-                        id="done" 
-                        {...register('done')}
-                    >
+                    <select {...register('done')} className='text-sm shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline' id="done">
                         {selectItems?.map((option, index) => {
                             return(
-                                <option key={index} value={option.value} className='p-4 text-sm border-none'>
+                                <option key={index} value={option.value} className='text-sm border-none bg-neutral-100 font-medium p-20'>
                                     {option.label}
                                 </option>
                             )
